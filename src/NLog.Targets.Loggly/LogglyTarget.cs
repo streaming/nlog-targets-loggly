@@ -32,6 +32,8 @@ namespace NLog.Targets
     [Target("Loggly")]
     public class LogglyTarget : TargetWithLayout
     {
+        [RequiredParameter]
+        public string Tags { get; set; }
 
         protected override void Write(LogEventInfo logEvent)
         {
@@ -73,6 +75,11 @@ namespace NLog.Targets
             }
 
             logglyEvent.Data.Add("message", logMessage);
+            foreach (var tag in Tags.Split(','))
+            {
+                logglyEvent.Options.Tags.Add(new SimpleTag {Value = tag});
+            }
+
             foreach (var key in logEvent.Properties.Keys)
             {
                 logglyEvent.Data.AddIfAbsent(key.ToString(), logEvent.Properties[key]);
